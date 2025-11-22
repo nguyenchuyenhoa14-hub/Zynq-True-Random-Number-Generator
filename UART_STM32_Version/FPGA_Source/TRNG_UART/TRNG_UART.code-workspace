@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "signal",
+			"path": "../signal"
+		}
+	],
+	"settings": {}
+}
