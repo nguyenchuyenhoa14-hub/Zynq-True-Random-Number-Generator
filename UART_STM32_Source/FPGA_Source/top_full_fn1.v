@@ -3,16 +3,14 @@
 module top_full_fn1(
     input wire clk,
     input wire rst,
-    input wire button,      // Nút nhấn Enable TRNG
+    input wire button,     
     
-    // Output ra ngoài (cho LED hoặc Logic Analyzer)
     output wire [31:0] data_out, // Final output from FIFO 2
-    output wire [3:0] data_output, // LED debug (4 bit cuối)
+    output wire [3:0] data_output, // LED debug 
     output wire full_1,     // Debug: FIFO 1 Full
     output wire full_2,     // Debug: FIFO 2 Full
     output wire loading_out, // Debug: CPU Status
 
-    // Các tín hiệu Debug nội bộ (đưa ra port để quan sát waveform dễ hơn)
     output wire [31:0] fifo2_wr_data,
     output wire [31:0] trng_word,
     output wire [31:0] fifo1_rd_data,
@@ -29,12 +27,9 @@ module top_full_fn1(
     output wire [31:0] mem_rdata
     );
     
-    //------------------------------------------------------------------
-    // 1. TRNG CORE (Sinh số ngẫu nhiên)
-    //------------------------------------------------------------------
+
     wire trng_valid;
-    // Nút nhấn dùng để enable module sinh số
-    wire enable_trng = 1'b1; 
+    wire enable_trng = 1'b1; //enable to genẻate number
 
     top_trng u_trng_inst (
         .clk(clk),
@@ -44,10 +39,6 @@ module top_full_fn1(
         .data_valid(trng_valid) // Valid Pulse
     );
 
-    //------------------------------------------------------------------
-    // 2. FIFO 1 (Input Buffer: TRNG -> CPU)
-    //------------------------------------------------------------------
-    // Chỉ ghi vào FIFO khi TRNG có dữ liệu mới VÀ FIFO chưa đầy
     assign fifo1_wr_en = trng_valid & ~fifo1_full;
     
     fifo32 #(.DEPTH(16)) fifo_in (
@@ -59,13 +50,10 @@ module top_full_fn1(
         .full(fifo1_full),
         // Read Side (To CPU via RAM_IO)
         .rd_en(fifo1_rd_en),
-        .rd_data(fifo1_rd_data), // Sử dụng fifo32.v mới (dạng wire output)
+        .rd_data(fifo1_rd_data),
         .empty(fifo1_empty)
     );
 
-    //------------------------------------------------------------------
-    // 3. FIFO 2 (Output Buffer: CPU -> External Output)
-    //------------------------------------------------------------------
     wire [31:0] fifo2_rd_data_wire;
     reg button_prev;
 
@@ -108,14 +96,10 @@ module top_full_fn1(
     assign data_out = data_out_reg;
     assign data_output = data_out[3:0]; // Debug LEDs
 
-    //------------------------------------------------------------------
-    // 4. RAM & I/O CONTROLLER
-    //------------------------------------------------------------------
     wire mem_valid_cpu, mem_ready_cpu;
     wire [3:0] mem_wstrb_cpu;
     wire [31:0] mem_addr_cpu, mem_wdata_cpu, mem_rdata_cpu;
 
-    // Gán ra output debug module
     assign mem_addr = mem_addr_cpu;
     assign mem_rdata = mem_rdata_cpu;
     assign mem_wdata = mem_wdata_cpu;
@@ -148,23 +132,19 @@ module top_full_fn1(
         .loading_out(loading_out)
     );
 
-    // Gán tín hiệu debug FIFO ra ngoài module
     assign full_1 = fifo1_full;
     assign full_2 = fifo2_full;
 
-    //------------------------------------------------------------------
-    // 5. PicoRV32 CPU
-    //------------------------------------------------------------------
     picorv32 #(
         .PROGADDR_RESET(32'h0000_0000),
-        .STACKADDR(32'h0000_2000), // 8KB RAM end address
+        .STACKADDR(32'h0000_2000), 
         .ENABLE_MUL(0),
         .ENABLE_DIV(0),
         .ENABLE_IRQ(0),
         .ENABLE_IRQ_QREGS(0)
     ) uv_cpu (
         .clk       (clk),
-        .resetn    (~rst), // Active Low Reset
+        .resetn    (~rst),
         .mem_valid (mem_valid_cpu),
         .mem_ready (mem_ready_cpu),
         .mem_addr  (mem_addr_cpu),
