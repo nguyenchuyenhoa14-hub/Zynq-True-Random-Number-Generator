@@ -11,8 +11,7 @@ module top_test(
     output wire loading_out
     );
     
-    // Các dây nối trung gian (Internal Wires) để debug
-    wire [3:0]  data_output_dummy; // Dùng nếu muốn xem LED
+    wire [3:0]  data_output_dummy;
     wire [31:0] fifo2_wr_data;
     wire [31:0] trng_word;
     wire [31:0] fifo1_rd_data;
