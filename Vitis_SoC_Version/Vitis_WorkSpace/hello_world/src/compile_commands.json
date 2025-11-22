@@ -1,0 +1,12 @@
+[
+{
+  "directory": "C:/Users/Admin/Downloads/TRNG_vitis/Nhung/hello_world/build",
+  "command": "D:\\2025.1.1\\Vitis\\gnu\\aarch32\\nt\\gcc-arm-none-eabi\\bin\\arm-none-eabi-gcc.exe -isystem C:/Users/Admin/Downloads/TRNG_vitis/Nhung/platform/export/platform/sw/standalone_ps7_cortexa9_0/include -isystem D:/2025.1.1/gnu/aarch32/nt/gcc-arm-none-eabi/x86_64-oesdk-mingw32/usr/lib/arm-xilinx-eabi/gcc/arm-xilinx-eabi/13.3.0/include -isystem D:/2025.1.1/gnu/aarch32/nt/gcc-arm-none-eabi/x86_64-oesdk-mingw32/usr/lib/arm-xilinx-eabi/gcc/arm-xilinx-eabi/13.3.0/include-fixed -isystem D:/2025.1.1/Vitis/gnu/aarch32/nt/gcc-arm-none-eabi/aarch32-xilinx-eabi/usr/include  -DSDT -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard  -MMD -MP -specs=C:/Users/Admin/Downloads/TRNG_vitis/Nhung/platform/export/platform/sw/standalone_ps7_cortexa9_0/Xilinx.spec -IC:/Users/Admin/Downloads/TRNG_vitis/Nhung/platform/export/platform/sw/standalone_ps7_cortexa9_0/include -Wall -Wextra      -O0  -g3     -U__clang__ -o CMakeFiles\\hello_world.elf.dir\\helloworld.c.obj -c C:\\Users\\Admin\\Downloads\\TRNG_vitis\\Nhung\\hello_world\\src\\helloworld.c",
+  "file": "C:\\Users\\Admin\\Downloads\\TRNG_vitis\\Nhung\\hello_world\\src\\helloworld.c"
+},
+{
+  "directory": "C:/Users/Admin/Downloads/TRNG_vitis/Nhung/hello_world/build",
+  "command": "D:\\2025.1.1\\Vitis\\gnu\\aarch32\\nt\\gcc-arm-none-eabi\\bin\\arm-none-eabi-gcc.exe -isystem C:/Users/Admin/Downloads/TRNG_vitis/Nhung/platform/export/platform/sw/standalone_ps7_cortexa9_0/include -isystem D:/2025.1.1/gnu/aarch32/nt/gcc-arm-none-eabi/x86_64-oesdk-mingw32/usr/lib/arm-xilinx-eabi/gcc/arm-xilinx-eabi/13.3.0/include -isystem D:/2025.1.1/gnu/aarch32/nt/gcc-arm-none-eabi/x86_64-oesdk-mingw32/usr/lib/arm-xilinx-eabi/gcc/arm-xilinx-eabi/13.3.0/include-fixed -isystem D:/2025.1.1/Vitis/gnu/aarch32/nt/gcc-arm-none-eabi/aarch32-xilinx-eabi/usr/include  -DSDT -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard  -MMD -MP -specs=C:/Users/Admin/Downloads/TRNG_vitis/Nhung/platform/export/platform/sw/standalone_ps7_cortexa9_0/Xilinx.spec -IC:/Users/Admin/Downloads/TRNG_vitis/Nhung/platform/export/platform/sw/standalone_ps7_cortexa9_0/include -Wall -Wextra      -O0  -g3     -U__clang__ -o CMakeFiles\\hello_world.elf.dir\\platform.c.obj -c C:\\Users\\Admin\\Downloads\\TRNG_vitis\\Nhung\\hello_world\\src\\platform.c",
+  "file": "C:\\Users\\Admin\\Downloads\\TRNG_vitis\\Nhung\\hello_world\\src\\platform.c"
+}
+]
