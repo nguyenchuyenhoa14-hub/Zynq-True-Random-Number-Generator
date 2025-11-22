@@ -21,28 +21,26 @@
 
 
 module top_uart(
-    input wire sys_clk,      // Clock 125MHz
-    input wire [1:0] btns,   // BTN1: Reset
-    output wire uart_txd,    // Chân P18 nối ra module UART ngoài
+    input wire sys_clk,     
+    input wire [1:0] btns,   
+    output wire uart_txd,    
     output wire [3:0] led_debug
     );
 
     wire clk = sys_clk;
     wire rst_clean;
     debounce #(.CLK_FREQ(125000000), .STABLE_MS(10)) u_db_rst (
-        .clk(clk), .rst(1'b0), // Không reset bộ chống rung này
+        .clk(clk), .rst(1'b0), 
         .btn_in(btns[1]), 
         .btn_out(rst_clean)
     );
     wire rst = rst_clean;
-    //wire rst = btns[1];      // Reset cứng (Active High)
+    //wire rst = btns[1];    
 
-    // --- 1. INSTANCE HỆ THỐNG SOC (PicoRV32 + TRNG) ---
-    wire [31:0] cpu_data_out;  // Dữ liệu CPU đẩy ra FIFO 2
-    wire fifo2_empty;          // Báo hiệu FIFO 2 có hàng không
-    reg  read_trigger;         // Nút bấm ảo để lấy dữ liệu từ FIFO 2
+    wire [31:0] cpu_data_out;  
+    wire fifo2_empty;         
+    reg  read_trigger;         
 
-    // Các dây nối dummy (để tránh lỗi port map)
     wire [31:0] dummy_wdata, dummy_addr, dummy_rdata;
     wire [31:0] dummy_trng_word, dummy_fifo1_rd, dummy_fifo2_wr;
     wire dummy_f1_full, dummy_f1_empty, dummy_f1_rd, dummy_f2_full, dummy_f2_wr, dummy_f1_wr;
@@ -62,17 +60,14 @@ module top_uart(
     always @(posedge clk) btn0_d <= btn0_clean;
     
     wire btn_press = btn0_clean & ~btn0_d;
-    // Instance module "trùm cuối" của bạn
     top_full_fn1 u_system (
         .clk(clk),
         .rst(rst),
-        .button(read_trigger), // Nối vào bộ điều khiển UART bên dưới
+        .button(read_trigger), 
         
-        // Output quan trọng nhất: Dữ liệu từ CPU
         .data_out(cpu_data_out), 
-        .fifo2_empty(fifo2_empty), // Để biết khi nào CPU gửi hàng
+        .fifo2_empty(fifo2_empty), 
 
-        // Các chân debug (Nối vào dummy wire)
         .data_output(dummy_led), .full_1(dummy_f1_full), .full_2(dummy_f2_full), .loading_out(dummy_load),
         .fifo2_wr_data(dummy_fifo2_wr), .trng_word(dummy_trng_word), .fifo1_rd_data(dummy_fifo1_rd),
         .mem_wdata(dummy_wdata), .fifo1_full(dummy_f1_full), .fifo1_empty(dummy_f1_empty),
@@ -80,7 +75,6 @@ module top_uart(
         .fifo1_wr_en(dummy_f1_wr), .mem_addr(dummy_addr), .mem_rdata(dummy_rdata)
     );
 
-    // --- 2. UART TRANSMITTER ---
     reg tx_start;
     reg [7:0] tx_byte;
     wire tx_busy;
@@ -91,12 +85,6 @@ module top_uart(
         .tx_busy(tx_busy), .tx_pin(uart_txd)
     );
 
-    // --- 3. CONTROLLER (Cầu nối: Lấy từ FIFO 2 -> Gửi UART) ---
-    // Logic: 
-    // 1. Thấy FIFO 2 không rỗng (!fifo2_empty) -> Bật read_trigger = 1.
-    // 2. Lấy số 32-bit ra.
-    // 3. Chia thành 8 ký tự Hex -> Gửi lần lượt qua UART.
-    
     localparam S_IDLE = 0, S_TRIGGER = 1, S_WAIT_DATA = 2, 
                S_CONVERT = 3, S_SEND = 4, S_WAIT_TX = 5, 
                S_SEND_CR = 6, S_WAIT_CR = 7, S_SEND_LF = 8, S_WAIT_LF = 9;
@@ -114,28 +102,26 @@ module top_uart(
         end else begin
             case (state)
                 S_IDLE: begin
-                    // Nếu CPU đã đẩy hàng ra (FIFO2 có dữ liệu)
                     if (btn_press && !fifo2_empty) begin
-                        read_trigger <= 1; // Bấm nút ảo để Pop FIFO 2
+                        read_trigger <= 1; 
                         state <= S_TRIGGER;
                     end
                 end
 
                 S_TRIGGER: begin
-                    read_trigger <= 0; // Nhả nút
-                    // Đợi 1 nhịp để data_out cập nhật từ module con
+                    read_trigger <= 0; 
                     state <= S_WAIT_DATA; 
                 end
 
                 S_WAIT_DATA: begin
-                    captured_data <= cpu_data_out; // Chốt dữ liệu 32-bit
-                    nibble_idx <= 7; // Chuẩn bị gửi từ cao xuống thấp
+                    captured_data <= cpu_data_out; 
+                    nibble_idx <= 7; 
                     state <= S_CONVERT;
                 end
 
                 S_CONVERT: begin
                     nibble_val = (captured_data >> (nibble_idx * 4)) & 4'hF;
-                    // Hex to ASCII
+                  
                     if (nibble_val < 10) tx_byte <= nibble_val + "0";
                     else tx_byte <= nibble_val - 10 + "A";
                     
@@ -154,12 +140,10 @@ module top_uart(
                             nibble_idx <= nibble_idx - 1;
                             state <= S_CONVERT;
                         end else begin
-                            state <= S_SEND_CR; // Gửi xong số -> Xuống dòng
+                            state <= S_SEND_CR; 
                         end
                     end
                 end
-
-                // Gửi \r\n để xuống dòng đẹp
                 S_SEND_CR: begin tx_byte <= 8'h0D; tx_start <= 1; state <= S_WAIT_CR; end
                 S_WAIT_CR: begin tx_start <= 0; if (!tx_busy) state <= S_SEND_LF; end
                 S_SEND_LF: begin tx_byte <= 8'h0A; tx_start <= 1; state <= S_WAIT_LF; end
@@ -169,7 +153,6 @@ module top_uart(
         end
     end
 
-    // LED hiển thị trạng thái: [Có dữ liệu không, Đang gửi, State]
     assign led_debug = {~fifo2_empty, tx_busy, state[1:0]};
 
 endmodule
