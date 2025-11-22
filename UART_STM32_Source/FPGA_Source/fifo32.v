@@ -42,7 +42,7 @@ assign rd_data = mem[r_ptr];
                 w_ptr <= (w_ptr == DEPTH-1) ? 0 : w_ptr + 1; // Wrap around
             end
 
-            // Read (Chỉ cần tăng con trỏ)
+            // Read 
             if (rd_en && !empty) begin
                 r_ptr <= (r_ptr == DEPTH-1) ? 0 : r_ptr + 1; // Wrap around
             end
