@@ -23,8 +23,8 @@
 #include "xparameters.h"
 #include "sleep.h"
 
-#define DATA_BASE    XPAR_AXI_GPIO_0_BASEADDR // Đọc số Random (32-bit)
-#define CTRL_BASE    XPAR_AXI_GPIO_1_BASEADDR // Ghi lệnh (Rst, En, Read)
+#define DATA_BASE    XPAR_AXI_GPIO_0_BASEADDR // Random number 32-bit
+#define CTRL_BASE    XPAR_AXI_GPIO_1_BASEADDR // Rst, En, Read
 #define STATUS_BASE  XPAR_AXI_GPIO_2_BASEADDR
 
 #define GPIO_DATA_REG  0x00  // Thanh ghi dữ liệu
@@ -34,7 +34,7 @@ int main()
 {
     init_platform();
 
-    print("\033[2J\033[H"); // Xóa màn hình Terminal cho sạch
+    print("\033[2J\033[H"); // Delete terminal screen
     print("===========================================\n\r");
     print("   TRNG SYSTEM ON ARTY Z7 - READY   \n\r");
     print("===========================================\n\r");
@@ -42,13 +42,12 @@ int main()
     print(" > Press BTN1: Hardware Reset\n\r");
     print("-------------------------------------------\n\r");
 
-    // 1. CẤU HÌNH HƯỚNG (DIRECTION)
-    // Ghi vào thanh ghi TRI: 1 = Input, 0 = Output
+    // Write into reg: 1 = Input, 0 = Output
     Xil_Out32(DATA_BASE   + GPIO_TRI_REG, 0xFFFFFFFF); // Data = Input
     Xil_Out32(CTRL_BASE   + GPIO_TRI_REG, 0x00000000); // Control = Output
     Xil_Out32(STATUS_BASE + GPIO_TRI_REG, 0xFFFFFFFF); // Status = Input
 
-    // 2. KHỞI ĐỘNG & ENABLE TRNG
+    // ENABLE TRNG
     // Control Bits: [0]=RST, [1]=ENABLE, [2]=READ_REQ
     
     print("Initializing TRNG...\n\r");
@@ -58,17 +57,16 @@ int main()
     Xil_Out32(CTRL_BASE + GPIO_DATA_REG, 0x02); // Enable = 1
     print("Done. Waiting for user input...\n\r");
 
-    // Biến lưu trạng thái nút bấm để phát hiện cạnh lên
+    // Save btn state to find rising edge
     u32 last_btn0 = 0;
     u32 last_btn1 = 0;
 
     while(1) {
-        // 3. ĐỌC TRẠNG THÁI TỪ PHẦN CỨNG
         // Status Register Layout (4 bit):
         // Bit 0: Empty
         // Bit 1: Valid
-        // Bit 2: BTN0 (Lấy số)
-        // Bit 3: BTN1 (Reset)
+        // Bit 2: BTN0 l
+        // Bit 3: BTN1
         u32 status = Xil_In32(STATUS_BASE + GPIO_DATA_REG);
         
         int is_empty = status & 0x01;
@@ -76,7 +74,6 @@ int main()
         int btn0     = (status >> 2) & 0x01;
         int btn1     = (status >> 3) & 0x01;
 
-        // --- XỬ LÝ NÚT RESET (BTN1) ---
         if (btn1 == 1 && last_btn1 == 0) {
             print("\n!!! HARDWARE RESET DETECTED !!!\n\r");
             // Lưu ý: Phần cứng Verilog đã tự Reset rồi (nhờ dây sys_rst),
