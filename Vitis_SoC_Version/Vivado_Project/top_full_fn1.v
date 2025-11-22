@@ -1,16 +1,15 @@
 module top_full_fn1(
     input wire clk,
     input wire rst,          // Active HIGH reset (phù hợp với GPIO Zynq)
-    input wire read_req,     // SỬA: Tín hiệu đọc từ Zynq (thay cho button)
-    input wire enable_trng,  // SỬA: Tín hiệu enable từ Zynq (thay cho button treo cứng)
+    input wire read_req,     // Signal from Zynq 
+    input wire enable_trng,  // signal enable from Zynq 
     
     // Output data to Zynq
     output wire [31:0] data_out, 
-    output wire data_valid,  // Báo cho Zynq biết data ở data_out là hợp lệ
+    output wire data_valid,  
     
-    // Debug LEDs (vẫn giữ để nhìn trên board)
     output wire [3:0] led_debug,
-    output wire fifo_empty_flag // Báo cho Zynq biết có dữ liệu để đọc không
+    output wire fifo_empty_flag
     );
 
     // --- 1. TRNG Core ---
@@ -42,7 +41,7 @@ module top_full_fn1(
     wire [31:0] fifo2_wr_data;
     wire [31:0] fifo2_rd_data_internal;
 
-    // Logic đọc mới: Khi Zynq gửi tín hiệu read_req VÀ FIFO không rỗng
+    // Khi Zynq gửi tín hiệu read_req VÀ FIFO không rỗng
     reg read_req_d;
     always @(posedge clk) begin
         if (rst) read_req_d <= 0;
@@ -78,7 +77,6 @@ module top_full_fn1(
     assign led_debug = data_out[3:0]; // Debug LED
 
     // --- 4. RAM & CPU ---
-    // (Giữ nguyên phần kết nối Simple RAM và PicoRV32 như cũ)
     wire mem_valid_cpu, mem_ready_cpu;
     wire [3:0] mem_wstrb_cpu;
     wire [31:0] mem_addr_cpu, mem_wdata_cpu, mem_rdata_cpu;
