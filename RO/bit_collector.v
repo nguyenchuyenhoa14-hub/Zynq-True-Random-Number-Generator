@@ -20,7 +20,7 @@ module bit_collector (
             shift_reg <= 64'h0;
             bit_counter <= 6'h0;
             data_out <= 64'h0;
-            data-bit_valid <= 1'b0;
+            data_valid <= 1'b0;
         end else begin
             data_valid <= 1'b0;
 
