@@ -9,7 +9,7 @@ module ring_generator(
 );
 
     reg [63:0] q_reg;
-    reg [63:0] q_next;
+    wire [63:0] q_next;
     wire feedback_bit;
 
     assign feedback_bit = q_reg[63] ^ q_reg[62] ^ q_reg[60] ^ q_reg[59];
