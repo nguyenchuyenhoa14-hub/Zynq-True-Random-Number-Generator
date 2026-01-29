@@ -16,7 +16,7 @@ module ro_cell #(
     genvar i;
     generate
         for (i = 0; i < STAGES; i = i + 1) begin : gen_inverters
-            (* KEEP = "TRUE", DONT_TOUCH = "TRUE" *) assign #1 w[i+1] = ~w[i];
+            (* KEEP = "TRUE", DONT_TOUCH = "TRUE" *) assign w[i+1] = ~w[i];
         end
     endgenerate
 
