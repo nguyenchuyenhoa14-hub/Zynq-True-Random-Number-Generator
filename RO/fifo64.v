@@ -10,7 +10,7 @@ module fifo64 #(
         input wire wr_en,
         input wire [63:0] din,
         input wire rd_en,
-        output reg [31:0] dout,
+        output reg [63:0] dout,
         output wire full,
         output wire empty
         );
@@ -31,7 +31,7 @@ module fifo64 #(
             w_ptr <= 0;
             r_ptr <= 0;
             count <= 0;
-            dot <= 64'd0;
+            dout <= 64'd0;
         end
         else begin
             // Write
